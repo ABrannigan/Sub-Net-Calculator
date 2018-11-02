@@ -5,6 +5,7 @@ Created on Thu Nov  1 19:08:43 2018
 @author: adam
 """
 import sys
+import numpy as np
 
 def validateip(ipl):
     
@@ -52,9 +53,23 @@ def validatemask(maskl):
     else:
         return True
             
+def counthosts(binmaskl_pad):
     
+    countzero = 0
+    for x in binmaskl_pad:
+        if x == '0':
+            countzero += 1
     
+    numhosts = (2**countzero)-2
+    return numhosts
     
+def findwildcard(maskl):
+    
+    broacastmask = np.array([255,255,255,255])
+    subnetmask = np.array(maskl)
+    wilcardmask = broacastmask - subnetmask
+    
+    return wilcardmask
     
     
 
@@ -66,6 +81,7 @@ while True:
         
     ipl = [int(x) for x in ip.split('.')] # loop through ip split cast to int
     
+    #call validate mask funtion if ok break loop
     if validateip(ipl) is True:
         break 
 
@@ -77,10 +93,33 @@ while True:
         
     maskl = [int(y) for y in mask.split('.')]
     
-    validatemask(maskl)
-    
+    #call validate mask funtion if ok break loop
     if validatemask(maskl) is True:
         break
 
+#convert mask and ip octets to binary format and cast to int
+binipl = [int(bin(i)[2:]) for i in ipl]
+binmaskl = [int(bin(j)[2:]) for j in maskl]
 
+#pad with zeros 
+binipl_pad = [str(i).zfill(8) for i in binipl]
+binmaskl_pad = [str(j).zfill(8) for j in binmaskl]
+binipl_pad = '.'.join(binipl_pad)
+binmaskl_pad = '.'.join(binmaskl_pad)
+
+#calculate number of hosts
+hosts =counthosts(binmaskl_pad)
+
+#get wildcard
+wildcard = findwildcard(maskl)
+wildcard_pad = [str(i) for i in wildcard]
+wildcard_pad = '.'.join(wildcard_pad)
+ 
+print('ip : ' + binipl_pad)
+print('mask : ' + binmaskl_pad)
+print('Hosts : ' + str(hosts))
+print('WildCard Mask : ' + wildcard_pad)
+#print(type(binipl[0]))
+
+    
         
