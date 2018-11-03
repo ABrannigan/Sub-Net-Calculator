@@ -71,7 +71,27 @@ def findwildcard(maskl):
     
     return wilcardmask
     
+def findnetadd(ipl,maskl):
     
+    ip = np.array(ipl)
+    mask  = np.array(maskl)
+    netaddress = np.bitwise_and(ip , mask)
+    netstr = [str(x) for x in netaddress]
+    netstr='.'.join(netstr)
+    return netstr
+
+def findbroad(ipl,maskl):
+    
+    ip = np.array(ipl)           #[10, 1, 129, 1]
+    mask = np.array(maskl)       #[255, 255, 128, 0]
+    invertmask  = np.invert(np.array(mask, dtype = np.uint8))
+    #nota = np.binary_repr(mask.all(),width=8)
+    broadaddress = np.bitwise_or(ip , invertmask)
+    broadstr = [str(x) for x in broadaddress]
+    #broadint = [int(x,10) for x in broadstr]
+    broadstr='.'.join(broadstr)
+    return broadstr
+        
 
 while True:
     
@@ -114,11 +134,20 @@ hosts =counthosts(binmaskl_pad)
 wildcard = findwildcard(maskl)
 wildcard_pad = [str(i) for i in wildcard]
 wildcard_pad = '.'.join(wildcard_pad)
- 
+
+#grt network address
+netaddress = findnetadd(ipl,maskl)
+
+#get broadcast address
+broadaddress = findbroad(ipl,maskl)
+
+print('Network Address : ' + netaddress)
+print('Broadcast Address : ' + broadaddress) 
 print('ip : ' + binipl_pad)
 print('mask : ' + binmaskl_pad)
 print('Hosts : ' + str(hosts))
 print('WildCard Mask : ' + wildcard_pad)
+
 #print(type(binipl[0]))
 
     
